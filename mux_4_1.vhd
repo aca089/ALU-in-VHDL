@@ -1,0 +1,39 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+use work.eecs361_gates.all;
+
+
+entity mux_4_to_1 is
+	port(
+		sel: in std_logic_vector(1 downto 0);
+		src0: in std_logic;
+		src1: in std_logic;
+		src2: in std_logic;
+		src3: in std_logic;
+		z: out std_logic
+	
+	
+	);
+	
+end mux_4_to_1;
+
+architecture structural of mux_4_to_1 is
+
+	component mux
+		port(sel,src0,src1:in std_logic;
+			z:out std_logic
+		);
+	end component;
+	
+	
+	signal level1a, level1b:std_logic;
+	
+begin
+	u1:mux port map(sel=>sel(0),src0=>src0,src1=>src1,z=>level1a);
+	u2:mux port map(sel=>sel(0),src0=>src2,src1=>src3,z=>level1b);
+	u3:mux port map(sel=>sel(1),src0=>level1a,src1=>level1b,z=>z);
+
+
+
+end structural;

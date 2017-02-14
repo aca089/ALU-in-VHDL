@@ -1,0 +1,98 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+use work.eecs361_gates.all;
+use work.eecs361.mux_8_1;
+
+entity one_bit_alu is
+
+	port(a,b,Less,Less_unsigned,shift,carryIn: in std_logic;
+		Operation: in std_logic_vector(2 downto 0);
+		Result, CarryOut,Sum,Overflow:out std_logic
+	
+	);
+	
+end one_bit_alu;
+	
+	
+architecture structural of one_bit_alu is
+ 
+	component xor_gate
+		port(x,y:in std_logic;z:out std_logic);
+	end component;
+	
+	component and_gate
+		port(x,y:in std_logic;z:out std_logic);
+	end component;
+	
+	component or_gate
+		port(x,y:in std_logic;z:out std_logic);
+	end component;
+	
+	component one_bit_adder
+		port(a,b,CarryIn: in std_logic;sum: out std_logic;cout:out std_logic;overflow:out std_logic);
+	end component;
+	
+   component mux
+		port(sel,src0,src1:in std_logic;z:out std_logic);
+	end component;
+	
+	component mux_4_1
+	    port (sel: in std_logic_vector(1 downto 0);src0,src1,src2,src3:in std_logic;z:out std_logic);
+	end component;
+	
+	component mux_8_1
+	    port (sel: in std_logic_vector(2 downto 0);
+             src0: in std_logic;
+             src1: in std_logic;
+             src2: in std_logic;
+             src3: in std_logic;
+             src4: in std_logic;
+             src5: in std_logic;
+             src6: in std_logic;
+             src7: in std_logic;
+             z: out std_logic
+          
+          );
+      end component;
+
+
+   
+	signal and_output:std_logic;
+	signal or_output:std_logic;
+	signal add_output:std_logic;
+	signal sub_output:std_logic;
+	signal slt:std_logic;
+	signal slt_unsigned:std_logic;
+	signal xor_output:std_logic;
+	signal srl_input:std_logic;
+	signal xor_b:std_logic;
+	
+	signal mux_input: std_logic_vector(7 downto 0);
+	signal Binvert:std_logic;
+	signal mux_output:std_logic;
+	signal temp_overflow:std_logic;
+	
+	begin
+	    
+	       
+	    Binvert<=Operation(2);
+	  
+	    
+	    x0:and_gate port map(x=>a,y=>b,z=>and_output);
+	    x1:or_gate port map(x=>a,y=>b,z=>or_output);
+	    x2:one_bit_adder port map(a=>a,b=>xor_b,CarryIn=>carryIn,sum=>add_output,cout=>CarryOut,overflow=>temp_overflow);
+	    x3:xor_gate port map(x=>Binvert,y=>b,z=>xor_b);
+	    x4:xor_gate port map(x=>a,y=>b,z=>xor_output);
+	    x5:mux_8_1 port map(sel=>Operation,src0=>and_output,src1=>or_output,src2=>add_output,src3=>xor_output,src4=>slt,src5=>slt_unsigned,src6=>sub_output,src7=>srl_input,z=>mux_output);
+	    
+	    
+       Result<=mux_output;
+	    sub_output<=add_output;
+	    Sum<=add_output;
+	    slt_unsigned<=Less_unsigned;
+	    slt<=Less;
+	    srl_input<=shift;
+	    Overflow<=temp_overflow;
+	
+end architecture structural;	
